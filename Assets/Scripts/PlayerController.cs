@@ -4,84 +4,221 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+/// <summary>
+/// Компонент для управления игроком. Позволяет передвигать персонажа с помощью клавиатуры,
+/// мыши (клики) и сенсорных экранов (тапы) на мобильных устройствах.
+/// Также управляет анимациями и направлением взгляда персонажа.
+/// </summary>
 public class PlayerController : MonoBehaviour
 {
+    // Скорость перемещения игрока. Можно настроить в инспекторе Unity.
     [SerializeField] private float moveSpeed = 5f;
 
+    // Ссылка на сгенерированный класс управления вводом.
     private PlayerControls playerControls;
+
+    // Вектор текущего движения, полученный из ввода с клавиатуры.
     private Vector2 movement;
+
+    // Ссылка на компонент Rigidbody2D для физического перемещения персонажа.
     private Rigidbody2D rb;
+
+    // Ссылка на компонент Animator для управления анимациями.
+    private Animator myAnimator;
+
+    // Ссылка на компонент SpriteRenderer для управления направлением персонажа.
+    private SpriteRenderer mySpriteRenderer;
+
+    // Целевая позиция, к которой должен двигаться игрок при клике или тапе.
+    // Используем Nullable Vector2, чтобы определить, установлена ли цель.
     private Vector2? targetPosition = null;
+
+    // Ссылка на основную камеру для преобразования экранных координат в мировые.
     private Camera mainCamera;
 
+    /// <summary>
+    /// Метод вызывается при инициализации объекта.
+    /// Здесь происходит инициализация управления вводом, получение компонентов Rigidbody2D, Animator и SpriteRenderer,
+    /// а также основной камеры.
+    /// </summary>
     private void Awake()
     {
+        // Создаем экземпляр класса управления вводом.
         playerControls = new PlayerControls();
+
+        // Получаем компонент Rigidbody2D, прикрепленный к этому объекту.
         rb = GetComponent<Rigidbody2D>();
+
+        // Получаем компонент Animator, прикрепленный к этому объекту.
+        myAnimator = GetComponent<Animator>();
+
+        // Получаем компонент SpriteRenderer, прикрепленный к этому объекту.
+        mySpriteRenderer = GetComponent<SpriteRenderer>();
+
+        // Получаем основную камеру сцены.
         mainCamera = Camera.main;
     }
 
+    /// <summary>
+    /// Метод вызывается при включении компонента.
+    /// Включаем управление вводом.
+    /// </summary>
     private void OnEnable()
     {
         playerControls.Enable();
     }
 
+    /// <summary>
+    /// Метод вызывается при отключении компонента.
+    /// Отключаем управление вводом.
+    /// </summary>
     private void OnDisable()
     {
         playerControls.Disable();
     }
 
+    /// <summary>
+    /// Метод вызывается каждый кадр.
+    /// Обрабатывает ввод с клавиатуры, мыши и сенсорного экрана.
+    /// </summary>
     private void Update()
     {
+        // Обрабатываем ввод с клавиатуры.
         PlayerInput();
+
+        // Обрабатываем ввод с мыши и сенсорного экрана.
         HandlePointerInput();
     }
 
+    /// <summary>
+    /// Метод вызывается на фиксированных промежутках времени.
+    /// Выполняет физическое перемещение персонажа и корректирует направление взгляда.
+    /// </summary>
     private void FixedUpdate()
     {
+        // Корректируем направление взгляда персонажа.
+        AdjustPlayerFacingDirection();
+
+        // Выполняем перемещение персонажа.
         Move();
     }
 
+    /// <summary>
+    /// Получает значение ввода с клавиатуры для движения.
+    /// </summary>
     private void PlayerInput()
     {
+        // Читаем значение вектора движения из системы ввода.
         movement = playerControls.Movement.Move.ReadValue<Vector2>();
+
+        // В данном методе больше не обновляем параметры анимации.
+        // Это будет делаться в методе Move().
     }
 
+    /// <summary>
+    /// Обрабатывает ввод с указателя (мышь) и сенсорного экрана.
+    /// Устанавливает целевую позицию при клике или тапе.
+    /// </summary>
     private void HandlePointerInput()
     {
-        // Обработка клика мышью
+        // Обработка клика мышью.
         if (Mouse.current.leftButton.wasPressedThisFrame)
         {
+            // Получаем позицию курсора мыши на экране.
             Vector2 mousePosition = Mouse.current.position.ReadValue();
+
+            // Преобразуем экранные координаты в мировые координаты.
             Vector3 worldPos = mainCamera.ScreenToWorldPoint(mousePosition);
-            targetPosition = worldPos;
+
+            // Устанавливаем целевую позицию (без учета оси Z).
+            targetPosition = new Vector2(worldPos.x, worldPos.y);
         }
 
-        // Обработка касания на мобильных устройствах
+        // Обработка касания на мобильных устройствах.
         if (Touchscreen.current != null && Touchscreen.current.primaryTouch.press.wasPressedThisFrame)
         {
+            // Получаем позицию касания на экране.
             Vector2 touchPosition = Touchscreen.current.primaryTouch.position.ReadValue();
+
+            // Преобразуем экранные координаты в мировые координаты.
             Vector3 worldPos = mainCamera.ScreenToWorldPoint(touchPosition);
-            targetPosition = worldPos;
+
+            // Устанавливаем целевую позицию (без учета оси Z).
+            targetPosition = new Vector2(worldPos.x, worldPos.y);
         }
     }
 
+    /// <summary>
+    /// Перемещает персонажа либо в направлении ввода с клавиатуры,
+    /// либо к целевой позиции, установленной кликом или тапом.
+    /// Также обновляет параметры анимации и направление взгляда.
+    /// </summary>
     private void Move()
     {
+        Vector2 currentPosition = rb.position;
+        Vector2 newMovement = Vector2.zero; // Временный вектор движения для анимации
+
         if (targetPosition.HasValue)
         {
-            Vector2 direction = (targetPosition.Value - rb.position).normalized;
-            rb.MovePosition(rb.position + direction * (moveSpeed * Time.fixedDeltaTime));
+            // Вычисляем направление к целевой позиции.
+            Vector2 direction = (targetPosition.Value - currentPosition).normalized;
 
-            // Проверка, достиг ли персонаж целевой позиции
-            if (Vector2.Distance(rb.position, targetPosition.Value) < 0.1f)
+            // Перемещаем персонажа в направлении к цели с учетом скорости и времени.
+            rb.MovePosition(currentPosition + direction * (moveSpeed * Time.fixedDeltaTime));
+
+            // Обновляем параметры анимации на основе направления движения к цели.
+            myAnimator.SetFloat("moveX", direction.x);
+            myAnimator.SetFloat("moveY", direction.y);
+
+            // Устанавливаем скорость анимации на максимальную при движении к цели.
+            myAnimator.SetFloat("speed", 1f);
+
+            // Проверяем, достиг ли персонаж целевой позиции с небольшим порогом.
+            if (Vector2.Distance(currentPosition, targetPosition.Value) < 0.1f)
             {
+                // Если достиг, сбрасываем целевую позицию.
                 targetPosition = null;
+
+                // Сбрасываем параметр скорости для перехода в состояние покоя.
+                myAnimator.SetFloat("speed", 0f);
             }
         }
         else
         {
-            rb.MovePosition(rb.position + movement * (moveSpeed * Time.fixedDeltaTime));
+            // Перемещаемся по вводу с клавиатуры.
+            rb.MovePosition(currentPosition + movement * (moveSpeed * Time.fixedDeltaTime));
+
+            // Вычисляем скорость для анимации на основе ввода с клавиатуры.
+            float speed = movement.sqrMagnitude;
+
+            // Обновляем параметры анимации на основе ввода с клавиатуры.
+            myAnimator.SetFloat("moveX", movement.x);
+            myAnimator.SetFloat("moveY", movement.y);
+            myAnimator.SetFloat("speed", speed);
+        }
+    }
+
+    /// <summary>
+    /// Корректирует направление взгляда персонажа в зависимости от позиции указателя мыши.
+    /// Переворачивает спрайт персонажа по оси X, если указатель находится слева от персонажа.
+    /// </summary>
+    private void AdjustPlayerFacingDirection()
+    {
+        // Получаем текущую позицию мыши на экране.
+        Vector3 mousePos = Input.mousePosition;
+
+        // Преобразуем позицию персонажа из мировых координат в экранные координаты.
+        Vector3 playerScreenPoint = mainCamera.WorldToScreenPoint(transform.position);
+
+        if (mousePos.x < playerScreenPoint.x)
+        {
+            // Переворачиваем спрайт персонажа по оси X, если курсор слева.
+            mySpriteRenderer.flipX = true;
+        }
+        else
+        {
+            // Сбрасываем переворот спрайта, если курсор справа.
+            mySpriteRenderer.flipX = false;
         }
     }
 }
