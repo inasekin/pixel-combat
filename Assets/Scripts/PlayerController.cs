@@ -170,17 +170,11 @@ public class PlayerController : MonoBehaviour
             myAnimator.SetFloat("moveX", direction.x);
             myAnimator.SetFloat("moveY", direction.y);
 
-            // Устанавливаем скорость анимации на максимальную при движении к цели.
-            myAnimator.SetFloat("speed", 1f);
-
             // Проверяем, достиг ли персонаж целевой позиции с небольшим порогом.
             if (Vector2.Distance(currentPosition, targetPosition.Value) < 0.1f)
             {
                 // Если достиг, сбрасываем целевую позицию.
                 targetPosition = null;
-
-                // Сбрасываем параметр скорости для перехода в состояние покоя.
-                myAnimator.SetFloat("speed", 0f);
             }
         }
         else
@@ -194,7 +188,6 @@ public class PlayerController : MonoBehaviour
             // Обновляем параметры анимации на основе ввода с клавиатуры.
             myAnimator.SetFloat("moveX", movement.x);
             myAnimator.SetFloat("moveY", movement.y);
-            myAnimator.SetFloat("speed", speed);
         }
     }
 
