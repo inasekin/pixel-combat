@@ -13,10 +13,12 @@ public class EnemyPathfinding : MonoBehaviour
     
     // Направление, в котором враг должен двигаться.
     private Vector2 moveDir;
+    private Knockback knockback;
 
     // Метод Awake вызывается при инициализации объекта. Здесь мы получаем ссылку на компонент Rigidbody2D.
     private void Awake()
     {
+        knockback = GetComponent<Knockback>();
         // Получение компонента Rigidbody2D, который отвечает за физическое перемещение объекта.
         rb2d = GetComponent<Rigidbody2D>();
     }
@@ -24,6 +26,10 @@ public class EnemyPathfinding : MonoBehaviour
     // Метод FixedUpdate вызывается на каждом фиксированном кадре физики. Здесь мы перемещаем врага на основе его направления движения.
     private void FixedUpdate()
     {
+        if (knockback.gettingKnockedback)
+        {
+            return;
+        }
         // Перемещаем объект, добавляя к его текущей позиции направление движения, умноженное на скорость и время.
         rb2d.MovePosition(rb2d.position + moveDir * (moveSpeed * Time.fixedDeltaTime));
     }

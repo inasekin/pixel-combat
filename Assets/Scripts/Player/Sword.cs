@@ -11,6 +11,8 @@ public class Sword : MonoBehaviour
     // Точка, где будет создана анимация удара
     [SerializeField] private Transform slashAnimSpawnPoint;
     
+    [SerializeField] private Transform weaponCollider;
+    
     // Ссылка на управление игроком
     private PlayerControls playerControls;
     
@@ -67,14 +69,20 @@ public class Sword : MonoBehaviour
     {
         // Запускаем триггер анимации атаки
         myAnimator.SetTrigger("Attack");
+        weaponCollider.gameObject.SetActive(true);
         
         // Создаем анимацию удара по заданной позиции и устанавливаем её родителем объект игрока
         slashAnim = Instantiate(slashAnimPrefab, slashAnimSpawnPoint.position, Quaternion.identity);
         slashAnim.transform.parent = this.transform.parent;
     }
 
+    public void DoneAttackingAnimEvent()
+    {
+        weaponCollider.gameObject.SetActive(false);
+    }
+
     // Метод для корректировки анимации удара вверх (если персонаж смотрит влево)
-    public void SwingUpFlipAnim()
+    public void SwingUpFlipAnimEvent()
     {
         // Разворачиваем анимацию удара вверх
         slashAnim.gameObject.transform.rotation = Quaternion.Euler(-180, 0, 0);
@@ -87,7 +95,7 @@ public class Sword : MonoBehaviour
     }
     
     // Метод для корректировки анимации удара вниз (если персонаж смотрит влево)
-    public void SwingDownFlipAnim()
+    public void SwingDownFlipAnimEvent()
     {
         // Разворачиваем анимацию удара вниз
         slashAnim.gameObject.transform.rotation = Quaternion.Euler(0, 0, 0);
@@ -115,11 +123,12 @@ public class Sword : MonoBehaviour
         if (mousePosition.x < playerScreenPoint.x)
         {
             activeWeapon.transform.rotation = Quaternion.Euler(0, -180, angle);
+            weaponCollider.transform.rotation = Quaternion.Euler(0, -180, 0);
         }
         else
         {
-            // Если курсор мыши находится справа от персонажа, сбрасываем поворот
             activeWeapon.transform.rotation = Quaternion.Euler(0, 0, angle);
+            weaponCollider.transform.rotation = Quaternion.Euler(0, 0, 0);
         }
     }
 }

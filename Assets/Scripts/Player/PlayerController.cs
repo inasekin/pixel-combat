@@ -18,6 +18,8 @@ public class PlayerController : MonoBehaviour
         set { facingLeft = value; }
     }
     
+    public static PlayerController Instance;
+    
     // Скорость перемещения игрока. Можно настроить в инспекторе Unity.
     [SerializeField] private float moveSpeed = 5f;
 
@@ -53,6 +55,7 @@ public class PlayerController : MonoBehaviour
     /// </summary>
     private void Awake()
     {
+        Instance = this;
         // Создаем экземпляр класса управления вводом.
         playerControls = new PlayerControls();
 
