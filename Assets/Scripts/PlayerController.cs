@@ -11,6 +11,13 @@ using UnityEngine.InputSystem;
 /// </summary>
 public class PlayerController : MonoBehaviour
 {
+    // Создает геттер/сеттер для удобного изменения facingLeft
+    public bool FacingLeft
+    {
+        get { return facingLeft; }
+        set { facingLeft = value; }
+    }
+    
     // Скорость перемещения игрока. Можно настроить в инспекторе Unity.
     [SerializeField] private float moveSpeed = 5f;
 
@@ -35,6 +42,9 @@ public class PlayerController : MonoBehaviour
 
     // Ссылка на основную камеру для преобразования экранных координат в мировые.
     private Camera mainCamera;
+    
+    // Повернут ли наш персонаж в другую сторону
+    private bool facingLeft = false;
 
     /// <summary>
     /// Метод вызывается при инициализации объекта.
@@ -117,31 +127,18 @@ public class PlayerController : MonoBehaviour
 
     /// <summary>
     /// Обрабатывает ввод с указателя (мышь) и сенсорного экрана.
-    /// Устанавливает целевую позицию при клике или тапе.
+    /// Устанавливает целевую позицию при клике или тапе и запускает анимацию атаки при левом клике.
     /// </summary>
     private void HandlePointerInput()
     {
-        // Обработка клика мышью.
-        if (Mouse.current.leftButton.wasPressedThisFrame)
+        // Обработка правого клика мышью для перемещения.
+        if (Mouse.current.rightButton.wasPressedThisFrame)
         {
             // Получаем позицию курсора мыши на экране.
             Vector2 mousePosition = Mouse.current.position.ReadValue();
 
             // Преобразуем экранные координаты в мировые координаты.
             Vector3 worldPos = mainCamera.ScreenToWorldPoint(mousePosition);
-
-            // Устанавливаем целевую позицию (без учета оси Z).
-            targetPosition = new Vector2(worldPos.x, worldPos.y);
-        }
-
-        // Обработка касания на мобильных устройствах.
-        if (Touchscreen.current != null && Touchscreen.current.primaryTouch.press.wasPressedThisFrame)
-        {
-            // Получаем позицию касания на экране.
-            Vector2 touchPosition = Touchscreen.current.primaryTouch.position.ReadValue();
-
-            // Преобразуем экранные координаты в мировые координаты.
-            Vector3 worldPos = mainCamera.ScreenToWorldPoint(touchPosition);
 
             // Устанавливаем целевую позицию (без учета оси Z).
             targetPosition = new Vector2(worldPos.x, worldPos.y);
@@ -207,11 +204,13 @@ public class PlayerController : MonoBehaviour
         {
             // Переворачиваем спрайт персонажа по оси X, если курсор слева.
             mySpriteRenderer.flipX = true;
+            FacingLeft = true;
         }
         else
         {
             // Сбрасываем переворот спрайта, если курсор справа.
             mySpriteRenderer.flipX = false;
+            FacingLeft = false;
         }
     }
 }
