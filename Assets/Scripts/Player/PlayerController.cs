@@ -15,14 +15,15 @@ public class PlayerController : MonoBehaviour
     public bool FacingLeft
     {
         get { return facingLeft; }
-        set { facingLeft = value; }
     }
     
     public static PlayerController Instance;
     
     // Скорость перемещения игрока. Можно настроить в инспекторе Unity.
     [SerializeField] private float moveSpeed = 5f;
-
+    [SerializeField] private float dashSpeed = 4f;
+    [SerializeField] private TrailRenderer myTrailRenderer;
+    
     // Ссылка на сгенерированный класс управления вводом.
     private PlayerControls playerControls;
 
@@ -47,6 +48,7 @@ public class PlayerController : MonoBehaviour
     
     // Повернут ли наш персонаж в другую сторону
     private bool facingLeft = false;
+    private bool isDashing = false;
 
     /// <summary>
     /// Метод вызывается при инициализации объекта.
@@ -70,6 +72,11 @@ public class PlayerController : MonoBehaviour
 
         // Получаем основную камеру сцены.
         mainCamera = Camera.main;
+    }
+
+    private void Start()
+    {
+        playerControls.Combat.Dash.performed += _ => Dash();
     }
 
     /// <summary>
@@ -207,13 +214,35 @@ public class PlayerController : MonoBehaviour
         {
             // Переворачиваем спрайт персонажа по оси X, если курсор слева.
             mySpriteRenderer.flipX = true;
-            FacingLeft = true;
+            facingLeft = true;
         }
         else
         {
             // Сбрасываем переворот спрайта, если курсор справа.
             mySpriteRenderer.flipX = false;
-            FacingLeft = false;
+            facingLeft = false;
         }
+    }
+
+    private void Dash()
+    {
+        if (!isDashing)
+        {
+            isDashing = true;
+            moveSpeed *= dashSpeed;
+            myTrailRenderer.emitting = true;
+            StartCoroutine(EndDashRoutine()); 
+        }
+    }
+
+    private IEnumerator EndDashRoutine()
+    {
+        float dashDuration = .2f;
+        float dashCD = .25f;
+        yield return new WaitForSeconds(dashDuration);
+        moveSpeed /= dashSpeed;
+        myTrailRenderer.emitting = false;
+        yield return new WaitForSeconds(dashCD);
+        isDashing = false;
     }
 }

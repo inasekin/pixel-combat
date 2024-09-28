@@ -10,8 +10,8 @@ public class Sword : MonoBehaviour
     
     // Точка, где будет создана анимация удара
     [SerializeField] private Transform slashAnimSpawnPoint;
-    
     [SerializeField] private Transform weaponCollider;
+    [SerializeField] private float swordAttackCD = .5f;
     
     // Ссылка на управление игроком
     private PlayerControls playerControls;
@@ -27,6 +27,7 @@ public class Sword : MonoBehaviour
     
     // Ссылка на созданный объект анимации удара
     private GameObject slashAnim;
+    private bool attackButtonDown, isAttacking = false;
 
     // Метод Awake вызывается при инициализации объекта
     private void Awake()
@@ -53,8 +54,8 @@ public class Sword : MonoBehaviour
     // Метод Start вызывается один раз при старте объекта
     void Start()
     {
-        // Привязываем событие начала атаки к методу Attack
-        playerControls.Combat.Attack.started += _ => Attack();
+        playerControls.Combat.Attack.started += _ => StartAttacking();
+        playerControls.Combat.Attack.canceled += _ => StopAttacking();
     }
 
     // Метод Update вызывается каждый кадр
@@ -62,18 +63,40 @@ public class Sword : MonoBehaviour
     {
         // Обновляем положение меча в зависимости от положения мыши
         MouseFollowWithOffset();
+        Attack();
+    }
+
+    private void StartAttacking()
+    {
+        attackButtonDown = true;
+    }
+
+    private void StopAttacking()
+    {
+        attackButtonDown = false;
     }
 
     // Метод, вызывающий анимацию атаки мечом
     public void Attack()
     {
-        // Запускаем триггер анимации атаки
-        myAnimator.SetTrigger("Attack");
-        weaponCollider.gameObject.SetActive(true);
+        if (attackButtonDown && !isAttacking)
+        {
+            isAttacking = true;
+            // Запускаем триггер анимации атаки
+            myAnimator.SetTrigger("Attack");
+            weaponCollider.gameObject.SetActive(true);
         
-        // Создаем анимацию удара по заданной позиции и устанавливаем её родителем объект игрока
-        slashAnim = Instantiate(slashAnimPrefab, slashAnimSpawnPoint.position, Quaternion.identity);
-        slashAnim.transform.parent = this.transform.parent;
+            // Создаем анимацию удара по заданной позиции и устанавливаем её родителем объект игрока
+            slashAnim = Instantiate(slashAnimPrefab, slashAnimSpawnPoint.position, Quaternion.identity);
+            slashAnim.transform.parent = this.transform.parent;
+            StartCoroutine(AttackCDRoutine());
+        }
+    }
+
+    private IEnumerator AttackCDRoutine()
+    {
+        yield return new WaitForSeconds(swordAttackCD);
+        isAttacking = false;
     }
 
     public void DoneAttackingAnimEvent()
