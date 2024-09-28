@@ -49,6 +49,8 @@ public class PlayerController : MonoBehaviour
     // Повернут ли наш персонаж в другую сторону
     private bool facingLeft = false;
     private bool isDashing = false;
+    private float startingMoveSpeed;
+    
 
     /// <summary>
     /// Метод вызывается при инициализации объекта.
@@ -77,6 +79,7 @@ public class PlayerController : MonoBehaviour
     private void Start()
     {
         playerControls.Combat.Dash.performed += _ => Dash();
+        startingMoveSpeed = moveSpeed;
     }
 
     /// <summary>
@@ -240,7 +243,7 @@ public class PlayerController : MonoBehaviour
         float dashDuration = .2f;
         float dashCD = .25f;
         yield return new WaitForSeconds(dashDuration);
-        moveSpeed /= dashSpeed;
+        moveSpeed = startingMoveSpeed;
         myTrailRenderer.emitting = false;
         yield return new WaitForSeconds(dashCD);
         isDashing = false;

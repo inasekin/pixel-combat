@@ -5,6 +5,8 @@ using UnityEngine;
 // Класс, управляющий поведением врага
 public class EnemyAI : MonoBehaviour
 {
+    [SerializeField] private float roamChangeDirFloat = 2f;
+    
     // Внутренний enum, представляющий состояния врага. Пока что только одно состояние — "Роуминг".
     private enum State
     {
@@ -47,7 +49,7 @@ public class EnemyAI : MonoBehaviour
             enemyPathfinding.MoveTo(roamPosition);
             
             // Ждем 2 секунды перед следующим перемещением.
-            yield return new WaitForSeconds(2f);
+            yield return new WaitForSeconds(roamChangeDirFloat);
         }
     }
 

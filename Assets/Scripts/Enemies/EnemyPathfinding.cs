@@ -26,7 +26,7 @@ public class EnemyPathfinding : MonoBehaviour
     // Метод FixedUpdate вызывается на каждом фиксированном кадре физики. Здесь мы перемещаем врага на основе его направления движения.
     private void FixedUpdate()
     {
-        if (knockback.gettingKnockedback)
+        if (knockback.GettingKnockedback)
         {
             return;
         }
