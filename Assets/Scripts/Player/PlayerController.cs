@@ -95,7 +95,10 @@ public class PlayerController : Singleton<PlayerController>
     /// </summary>
     private void OnDisable()
     {
-        playerControls.Disable();
+        if (playerControls != null)
+        {
+            playerControls.Disable();
+        }
     }
 
     /// <summary>
