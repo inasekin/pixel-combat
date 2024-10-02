@@ -9,15 +9,13 @@ using UnityEngine.InputSystem;
 /// мыши (клики) и сенсорных экранов (тапы) на мобильных устройствах.
 /// Также управляет анимациями и направлением взгляда персонажа.
 /// </summary>
-public class PlayerController : MonoBehaviour
+public class PlayerController : Singleton<PlayerController>
 {
     // Создает геттер/сеттер для удобного изменения facingLeft
     public bool FacingLeft
     {
         get { return facingLeft; }
     }
-    
-    public static PlayerController Instance;
     
     // Скорость перемещения игрока. Можно настроить в инспекторе Unity.
     [SerializeField] private float moveSpeed = 5f;
@@ -57,9 +55,9 @@ public class PlayerController : MonoBehaviour
     /// Здесь происходит инициализация управления вводом, получение компонентов Rigidbody2D, Animator и SpriteRenderer,
     /// а также основной камеры.
     /// </summary>
-    private void Awake()
+    protected override void Awake()
     {
-        Instance = this;
+        base.Awake();
         // Создаем экземпляр класса управления вводом.
         playerControls = new PlayerControls();
 
