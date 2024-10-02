@@ -205,6 +205,12 @@ public class PlayerController : Singleton<PlayerController>
     /// </summary>
     private void AdjustPlayerFacingDirection()
     {
+        // Проверяем, что камера не null
+        if (mainCamera == null)
+        {
+            mainCamera = Camera.main;
+        }
+
         // Получаем текущую позицию мыши на экране.
         Vector3 mousePos = Input.mousePosition;
 
@@ -224,6 +230,7 @@ public class PlayerController : Singleton<PlayerController>
             facingLeft = false;
         }
     }
+
 
     private void Dash()
     {
