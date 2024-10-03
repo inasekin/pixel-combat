@@ -37,10 +37,11 @@ public class TransparentDetection : MonoBehaviour
     {
         if (other.gameObject.GetComponent<PlayerController>())
         {
-            if (spriteRenderer)
+            if (spriteRenderer && gameObject.activeInHierarchy)
             {
                 StartCoroutine(FadeRoutine(spriteRenderer, fadeTime, spriteRenderer.color.a, 1f));
-            } else if (tilemap)
+            } 
+            else if (tilemap && gameObject.activeInHierarchy)
             {
                 StartCoroutine(FadeRoutine(tilemap, fadeTime, tilemap.color.a, 1f));
             }
