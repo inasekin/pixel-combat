@@ -21,6 +21,7 @@ public class PlayerController : Singleton<PlayerController>
     [SerializeField] private float moveSpeed = 5f;
     [SerializeField] private float dashSpeed = 4f;
     [SerializeField] private TrailRenderer myTrailRenderer;
+    [SerializeField] private Transform weaponCollider;
     
     // Ссылка на сгенерированный класс управления вводом.
     private PlayerControls playerControls;
@@ -125,6 +126,10 @@ public class PlayerController : Singleton<PlayerController>
 
         // Выполняем перемещение персонажа.
         Move();
+    }
+    
+    public Transform GetWeaponCollider() {
+        return weaponCollider;
     }
 
     /// <summary>
