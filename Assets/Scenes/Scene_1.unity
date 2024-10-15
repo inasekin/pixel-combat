@@ -1533,7 +1533,7 @@ Transform:
   m_GameObject: {fileID: 519420028}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 7.6466675, y: -3.821473, z: -9.989794}
+  m_LocalPosition: {x: 7.616311, y: -3.821483, z: -9.989794}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -11955,6 +11955,7 @@ MonoBehaviour:
   dashSpeed: 4
   myTrailRenderer: {fileID: 526373412}
   weaponCollider: {fileID: 3441992}
+  clickEffectPrefab: {fileID: 4662950116681391804, guid: d13856c45a1e98145b7cc309a1d1720e, type: 3}
 --- !u!95 &1070353976
 Animator:
   serializedVersion: 5
