@@ -22,6 +22,7 @@ public class PlayerController : Singleton<PlayerController>
     [SerializeField] private float dashSpeed = 4f;
     [SerializeField] private TrailRenderer myTrailRenderer;
     [SerializeField] private Transform weaponCollider;
+    [SerializeField] private GameObject clickEffectPrefab;
     
     // Ссылка на сгенерированный класс управления вводом.
     private PlayerControls playerControls;
@@ -161,7 +162,22 @@ public class PlayerController : Singleton<PlayerController>
 
             // Устанавливаем целевую позицию (без учета оси Z).
             targetPosition = new Vector2(worldPos.x, worldPos.y);
+            
+            // Создаем эффект клика
+            ShowClickEffect(worldPos);
         }
+    }
+    
+    private void ShowClickEffect(Vector3 position)
+    {
+        // Устанавливаем Z координату в 0, чтобы эффект был видимым на экране
+        position.z = 0f;
+
+        // Создаем эффект клика на позиции
+        GameObject effect = Instantiate(clickEffectPrefab, position, Quaternion.identity);
+
+        // Если нужно, можно уничтожить объект через некоторое время
+        Destroy(effect, 0.7f); // Уничтожение через 0.5 секунд
     }
 
     /// <summary>
