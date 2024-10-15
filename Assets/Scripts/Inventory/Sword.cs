@@ -11,6 +11,7 @@ public class Sword : MonoBehaviour, IWeapon
     // Точка, где будет создана анимация удара
     [SerializeField] private Transform slashAnimSpawnPoint;
     [SerializeField] private float swordAttackCD = .5f;
+    [SerializeField] private WeaponInfo weaponInfo;
     
     // Ссылка на аниматор для управления анимациями меча
     private Animator myAnimator;
@@ -36,11 +37,14 @@ public class Sword : MonoBehaviour, IWeapon
         // Обновляем положение меча в зависимости от положения мыши
         MouseFollowWithOffset();
     }
+    
+    public WeaponInfo GetWeaponInfo() {
+        return weaponInfo;
+    }
 
     // Метод, вызывающий анимацию атаки мечом
     public void Attack()
     {
-        // isAttacking = true;
         // Запускаем триггер анимации атаки
         myAnimator.SetTrigger("Attack");
         weaponCollider.gameObject.SetActive(true);
@@ -48,13 +52,6 @@ public class Sword : MonoBehaviour, IWeapon
         // Создаем анимацию удара по заданной позиции и устанавливаем её родителем объект игрока
         slashAnim = Instantiate(slashAnimPrefab, slashAnimSpawnPoint.position, Quaternion.identity);
         slashAnim.transform.parent = this.transform.parent;
-        StartCoroutine(AttackCDRoutine());
-    }
-
-    private IEnumerator AttackCDRoutine()
-    {
-        yield return new WaitForSeconds(swordAttackCD);
-        ActiveWeapon.Instance.ToggleIsAttacking(false);
     }
 
     public void DoneAttackingAnimEvent()
