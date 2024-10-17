@@ -17,6 +17,8 @@ GameObject:
   - component: {fileID: 2532009575055099006}
   - component: {fileID: 819141496977403193}
   - component: {fileID: 6648220694037725492}
+  - component: {fileID: 2220043872156243709}
+  - component: {fileID: 4446283239595319741}
   m_Layer: 0
   m_Name: Slime
   m_TagString: Untagged
@@ -166,6 +168,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f229012f78795ad47ab4bb7af6cdb8fd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  roamChangeDirFloat: 2
 --- !u!114 &553758865860545257
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -193,6 +196,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   startingHealth: 3
   deathVFXPrefab: {fileID: 4231237414985117154, guid: 38db2ea0e659e5041849b9edd88c00c9, type: 3}
+  knockBackThrust: 15
 --- !u!114 &819141496977403193
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -220,6 +224,39 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   flashMaterial: {fileID: 2100000, guid: c8ef60fa13727f440ae0b790dc3a6ade, type: 2}
   restoreDefaultMatTime: 0.1
+--- !u!95 &2220043872156243709
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2524395633604351222}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: d3b4cddef78a9d24fbd29663acb5b7f5, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &4446283239595319741
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2524395633604351222}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c659148a1a17b064c8e77a3130d812a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &7847510694685414222
 GameObject:
   m_ObjectHideFlags: 0

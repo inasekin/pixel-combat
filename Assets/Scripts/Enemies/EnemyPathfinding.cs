@@ -14,10 +14,12 @@ public class EnemyPathfinding : MonoBehaviour
     // Направление, в котором враг должен двигаться.
     private Vector2 moveDir;
     private Knockback knockback;
+    private SpriteRenderer spriteRenderer;
 
     // Метод Awake вызывается при инициализации объекта. Здесь мы получаем ссылку на компонент Rigidbody2D.
     private void Awake()
     {
+        spriteRenderer = GetComponent<SpriteRenderer>();
         knockback = GetComponent<Knockback>();
         // Получение компонента Rigidbody2D, который отвечает за физическое перемещение объекта.
         rb2d = GetComponent<Rigidbody2D>();
@@ -32,6 +34,12 @@ public class EnemyPathfinding : MonoBehaviour
         }
         // Перемещаем объект, добавляя к его текущей позиции направление движения, умноженное на скорость и время.
         rb2d.MovePosition(rb2d.position + moveDir * (moveSpeed * Time.fixedDeltaTime));
+        
+        if (moveDir.x < 0) {
+            spriteRenderer.flipX = true;
+        } else {
+            spriteRenderer.flipX = false;
+        }
     }
 
     // Метод для задания цели передвижения (направления движения). Этот метод вызывается AI для установки новой позиции.
