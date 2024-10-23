@@ -55,8 +55,10 @@ public class ActiveInventory : MonoBehaviour
             return;
         }
 
-        GameObject weaponToSpawn = transform.GetChild(activeSlotIndex).
-            GetComponentInChildren<InventorySlot>().GetWeaponInfo().weaponPrefab;
+        Transform childTransform = transform.GetChild(activeSlotIndex);
+        InventorySlot inventorySlot = childTransform.GetComponentInChildren<InventorySlot>();
+        WeaponInfo weaponInfo = inventorySlot.GetWeaponInfo();
+        GameObject weaponToSpawn = weaponInfo.weaponPrefab;
 
         GameObject newWeapon = Instantiate(weaponToSpawn, ActiveWeapon.Instance.transform.position, Quaternion.identity);
 
