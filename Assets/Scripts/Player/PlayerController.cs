@@ -50,6 +50,7 @@ public class PlayerController : Singleton<PlayerController>
     private bool facingLeft = false;
     private bool isDashing = false;
     private float startingMoveSpeed;
+    private Knockback knockback;
     
 
     /// <summary>
@@ -74,6 +75,7 @@ public class PlayerController : Singleton<PlayerController>
 
         // Получаем основную камеру сцены.
         mainCamera = Camera.main;
+        knockback = GetComponent<Knockback>();
     }
 
     private void Start()
@@ -187,6 +189,8 @@ public class PlayerController : Singleton<PlayerController>
     /// </summary>
     private void Move()
     {
+        if (knockback.GettingKnockedBack) { return; }
+        
         Vector2 currentPosition = rb.position;
         Vector2 newMovement = Vector2.zero; // Временный вектор движения для анимации
 
