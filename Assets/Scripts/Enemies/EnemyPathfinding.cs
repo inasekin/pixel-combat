@@ -48,4 +48,8 @@ public class EnemyPathfinding : MonoBehaviour
         // Устанавливаем новое направление движения.
         moveDir = targetPosition;
     }
+    
+    public void StopMoving() {
+        moveDir = Vector3.zero;
+    }
 }

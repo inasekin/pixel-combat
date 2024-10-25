@@ -6,12 +6,22 @@ using UnityEngine;
 public class EnemyAI : MonoBehaviour
 {
     [SerializeField] private float roamChangeDirFloat = 2f;
+    [SerializeField] private float attackRange = 5f;
+    [SerializeField] private MonoBehaviour enemyType;
+    [SerializeField] private float attackCooldown = 2f;
+    [SerializeField] private bool stopMovingWhileAttacking = false;
+
+    private bool canAttack = true;
     
     // Внутренний enum, представляющий состояния врага. Пока что только одно состояние — "Роуминг".
     private enum State
     {
-        Roaming // Роуминг - состояние, при котором враг бродит по карте
+        Roaming, // Роуминг - состояние, при котором враг бродит по карте
+        Attacking
     }
+    
+    private Vector2 roamPosition;
+    private float timeRoaming = 0f;
     
     // Переменная, хранящая текущее состояние врага.
     private State state;
@@ -32,30 +42,70 @@ public class EnemyAI : MonoBehaviour
     // Метод Start вызывается один раз при старте скрипта. Запускается корутина для управления роумингом врага.
     private void Start()
     {
-        // Запуск корутины, которая будет управлять поведением роуминга.
-        StartCoroutine(RoamingRoutine());
+        roamPosition = GetRoamingPosition();
+    }
+    
+    private void Update() {
+        MovementStateControl();
     }
 
-    // Корутина, которая отвечает за поведение врага в состоянии "Roaming".
-    private IEnumerator RoamingRoutine()
-    {
-        // Пока враг находится в состоянии роуминга, он будет искать новую позицию для перемещения каждые 2 секунды.
-        while (state == State.Roaming)
+    private void MovementStateControl() {
+        switch (state)
         {
-            // Генерация новой случайной позиции для перемещения.
-            Vector2 roamPosition = GetRoamingPosition();
-            
-            // Перемещение врага к сгенерированной позиции.
-            enemyPathfinding.MoveTo(roamPosition);
-            
-            // Ждем 2 секунды перед следующим перемещением.
-            yield return new WaitForSeconds(roamChangeDirFloat);
+            default:
+            case State.Roaming:
+                Roaming();
+                break;
+
+            case State.Attacking:
+                Attacking();
+                break;
+        }
+    }
+    
+    private void Roaming() {
+        timeRoaming += Time.deltaTime;
+
+        enemyPathfinding.MoveTo(roamPosition);
+
+        if (Vector2.Distance(transform.position, PlayerController.Instance.transform.position) < attackRange) {
+            state = State.Attacking;
+        }
+
+        if (timeRoaming > roamChangeDirFloat) {
+            roamPosition = GetRoamingPosition();
         }
     }
 
+    private void Attacking() {
+        if (Vector2.Distance(transform.position, PlayerController.Instance.transform.position) > attackRange)
+        {
+            state = State.Roaming;
+        }
+
+        if (attackRange != 0 && canAttack) {
+            canAttack = false;
+            (enemyType as IEnemy)?.Attack();
+
+            if (stopMovingWhileAttacking) {
+                enemyPathfinding.StopMoving();
+            } else {
+                enemyPathfinding.MoveTo(roamPosition);
+            }
+
+            StartCoroutine(AttackCooldownRoutine());
+        }
+    }
+
+    private IEnumerator AttackCooldownRoutine() {
+        yield return new WaitForSeconds(attackCooldown);
+        canAttack = true;
+    }
+
     // Метод для получения случайной позиции рядом с текущей.
-    private Vector3 GetRoamingPosition()
+    private Vector2 GetRoamingPosition()
     {
+        timeRoaming = 0f;
         // Генерация случайного направления для перемещения (в диапазоне от -1 до 1) и нормализация для создания единичного вектора.
         return new Vector2(Random.Range(-1f, 1f), Random.Range(-1f, 1f)).normalized;
     }
